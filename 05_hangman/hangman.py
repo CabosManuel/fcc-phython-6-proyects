@@ -3,6 +3,7 @@ import string
 
 
 from random_words import words
+from hangman_pics import hangman_pics
 
 
 def get_word(list_words):
@@ -17,9 +18,7 @@ def get_word(list_words):
 def hangMan():
   print("\nTry to guess a word")
 
-  word = get_word()
-  # chars = list(word)
-  # length = len(chars)
+  word = get_word(words)
   
   letters_to_guess = set(word) # Conjunto, no tiene elementos repetidos
   letters_guessed = set() # != {} <- Diccionario
@@ -30,20 +29,45 @@ def hangMan():
   while len(letters_to_guess) > 0 and lives > 0:
     hearts = '♥' * lives
     print(f'{6} lives ' + hearts)
-    print(f'Used letters: {' '.join(letters_guessed)}')
+    print(f"Used letters: {' '.join(letters_guessed)}")
 
+    word_progress = [
+      # List Comprehension: En una linea según una condición agregar un dato a la lista
+      letter
+        if letter in letters_guessed 
+        else '_'
+      for letter in word 
+    ]
+    # Show hangman
+    print(hangman_pics[lives])
+    # Show letters separated
+    print(f"Word: {' '.join(word_progress)}")
 
-    # print(HANGMANPICS[failures])
-    
+    letter_user = input("Type a letter: ").upper()
 
-    letter = input("\nType a letter: ")
+    # Add to letters_guessed,
+    # if letter in alphabet and not in letters_guessed
+    if letter_user in alphabet - letters_guessed: # Resta de "sets" (Conjuntos)
+      letters_guessed.add(letter_user)
 
-    if letter in chars:
-      print('guess')
+      # Remove to letters_to_guess,
+      # If letter in letter_to_guess, else lost life
+      if letter_user in letters_to_guess:
+        letters_to_guess.remove(letter_user)
+        print('')
+      else:
+        lives -= 1
+        print(f"\nYour letter, {letter_user} not in word")
+    # If letter has already been entered
+    elif letter_user in letters_guessed:
+      print("\nThis letter has already been entered")
     else:
-      print('wrong')
-      failures += 1
-      print(HANGMANPICS[failures])
+      print("\nThis letter is not valid")
 
+  if lives == 0:
+    print(hangman_pics[0])
+    print(f"You lose! the word was: {word}")
+  else:
+    print(f"You win! the word is: {word}")
 
 hangMan()
